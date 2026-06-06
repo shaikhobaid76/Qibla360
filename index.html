@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#022c22" media="(prefers-color-scheme: light)">
+  <meta name="description" content="Sacred Direction Finder - Qibla & Masjid Nabawi compass with high precision">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Qibla Compass">
+  <link rel="apple-touch-icon" href="images/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  <link rel="shortcut icon" href="images/favicon.ico">
+  <link rel="manifest" href="manifest.json">
   <title>Qibla & Madina Compass | Sacred Direction Finder</title>
   <style>
     * {
@@ -189,6 +199,80 @@
       box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
     }
 
+    /* TOP DIRECTION ARROW */
+    .top-direction-bar {
+      position: fixed;
+      top: 85px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(20px);
+      padding: 8px 20px;
+      border-radius: 60px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    body.madina-mode .top-direction-bar {
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .direction-arrow {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s linear;
+    }
+
+    .direction-arrow svg {
+      width: 32px;
+      height: 32px;
+      filter: drop-shadow(0 0 4px currentColor);
+    }
+
+    body.qibla-mode .direction-arrow svg {
+      color: #D4AF37;
+    }
+
+    body.madina-mode .direction-arrow svg {
+      color: #10B981;
+    }
+
+    .direction-text {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    body.qibla-mode .direction-text {
+      color: #D4AF37;
+    }
+
+    body.madina-mode .direction-text {
+      color: #10B981;
+    }
+
+    .direction-degree {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      margin-left: 8px;
+    }
+
+    @keyframes arrowPulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .direction-arrow {
+      animation: arrowPulse 1.5s infinite;
+    }
+
     /* Compass Wrapper */
     .compass-wrapper {
       position: relative;
@@ -353,6 +437,7 @@
       }
     }
 
+    /* Top circle on needle */
     .needle::before {
       content: '⬤';
       position: absolute;
@@ -372,21 +457,25 @@
       text-shadow: 0 0 8px #10B981;
     }
 
+    /* Bottom Arrow on Needle - REPLACED STAR WITH ARROW */
     .needle::after {
-      content: '✦';
+      content: '▼';
       position: absolute;
-      bottom: -16px;
+      bottom: -20px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 14px;
+      font-size: 18px;
+      font-weight: bold;
     }
 
     body.qibla-mode .needle::after {
       color: #D4AF37;
+      text-shadow: 0 0 6px #D4AF37;
     }
 
     body.madina-mode .needle::after {
       color: #10B981;
+      text-shadow: 0 0 6px #10B981;
     }
 
     .north-indicator {
@@ -545,7 +634,7 @@
     /* Debug Panel */
     .debug-panel {
       position: fixed;
-      top: 80px;
+      top: 140px;
       left: 10px;
       right: 10px;
       background: rgba(0, 0, 0, 0.85);
@@ -589,21 +678,43 @@
       .guidance-text {
         font-size: 0.8rem;
       }
+      .top-direction-bar {
+        top: 75px;
+        padding: 6px 16px;
+      }
+      .direction-arrow {
+        width: 32px;
+        height: 32px;
+      }
+      .direction-arrow svg {
+        width: 26px;
+        height: 26px;
+      }
+      .direction-text {
+        font-size: 0.75rem;
+      }
+      .needle::after {
+        font-size: 14px;
+        bottom: -16px;
+      }
     }
   </style>
 </head>
 <body class="qibla-mode">
 <div class="bg-pattern"></div>
+
+
+
 <div class="container">
   <!-- Mode Switch -->
   <div class="mode-switch">
     <button class="mode-btn qibla active" id="qiblaModeBtn">
       <img src="images/kabah.png" alt="Kabah" id="kabahIconBtn" onerror="this.style.display='none'; this.nextSibling.style.display='inline'">
-      <span>🕋 QIBLA MODE</span>
+      <span>QIBLA MODE</span>
     </button>
     <button class="mode-btn madina" id="madinaModeBtn">
       <img src="images/madina.png" alt="Madina" id="madinaIconBtn" onerror="this.style.display='none'; this.nextSibling.style.display='inline'">
-      <span>🕌 MADINA MODE</span>
+      <span>MADINA MODE</span>
     </button>
   </div>
 
@@ -724,6 +835,11 @@
     const qiblaModeBtn = document.getElementById('qiblaModeBtn');
     const madinaModeBtn = document.getElementById('madinaModeBtn');
     
+    // Top direction arrow elements
+    const topDirectionArrow = document.getElementById('topDirectionArrow');
+    const directionNameSpan = document.getElementById('directionName');
+    const directionDegreeSpan = document.getElementById('directionDegree');
+    
     // Debug elements
     const debugGps = document.getElementById('debugGps');
     const debugRawHeading = document.getElementById('debugRawHeading');
@@ -739,6 +855,27 @@
     const MADINA_IMAGE = 'images/madina.png';
     
     // ==================== HELPER FUNCTIONS ====================
+    function getDirectionName(degree) {
+      const directions = [
+        'North', 'North-East', 'East', 'South-East',
+        'South', 'South-West', 'West', 'North-West'
+      ];
+      const index = Math.round(((degree % 360) / 45)) % 8;
+      return directions[index];
+    }
+    
+    function updateTopDirectionArrow(heading) {
+      if (!heading && heading !== 0) return;
+      
+      // Rotate the arrow to point in the direction user is facing
+      topDirectionArrow.style.transform = `rotate(${heading}deg)`;
+      
+      // Update text
+      const direction = getDirectionName(heading);
+      directionNameSpan.textContent = direction;
+      directionDegreeSpan.textContent = Math.round(heading) + '°';
+    }
+    
     function calculateAngle(lat, lon, targetLat, targetLon) {
       const φ1 = lat * Math.PI / 180;
       const φ2 = targetLat * Math.PI / 180;
@@ -787,7 +924,6 @@
         if (debugMode) debugMode.textContent = 'Madina';
       }
       
-      // Reset lock state
       isLocked = false;
       alignmentTriggered = false;
       if (debugLock) debugLock.textContent = 'UNLOCKED';
@@ -847,6 +983,9 @@
       
       const smoothed = smoothHeading(rawHeading);
       filteredHeading = smoothed;
+      
+      // Update top direction arrow
+      updateTopDirectionArrow(filteredHeading);
       
       currentHeadingSpan.textContent = Math.round(filteredHeading);
       
@@ -1029,6 +1168,23 @@
       }
     }
     
+    // PWA Install
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const banner = document.createElement('div');
+      banner.className = 'install-banner';
+      banner.innerHTML = `<span>📱 Install App for easy access</span><button id="installAppBtn">Install</button>`;
+      document.body.appendChild(banner);
+      document.getElementById('installAppBtn').addEventListener('click', () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(() => { banner.classList.add('hide'); });
+        }
+      });
+    });
+    
     // ==================== INIT ====================
     function init() {
       startGPS();
@@ -1041,12 +1197,54 @@
       debugBtn.addEventListener('click', toggleDebug);
       fullscreenBtn.addEventListener('click', toggleFullscreen);
       
-      console.log('[App] Dual Mode Qibla & Madina Compass with Images Ready');
-      console.log('[Images] Place images in "images/kabah.png" and "images/madina.png"');
+      console.log('[App] Dual Mode Qibla & Madina Compass with Top Direction Arrow & Bottom Needle Arrow - Ready');
     }
     
     init();
   })();
+</script>
+
+<style>
+  .install-banner {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    backdrop-filter: blur(20px);
+    padding: 12px 20px;
+    border-radius: 60px;
+    display: flex;
+    gap: 15px;
+    z-index: 200;
+    border: 1px solid rgba(212,175,55,0.5);
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .install-banner button {
+    background: #D4AF37;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 40px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .install-banner.hide {
+    display: none;
+  }
+</style>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(reg => {
+        console.log('Service Worker registered:', reg);
+      }).catch(err => {
+        console.log('SW registration failed:', err);
+      });
+    });
+  }
 </script>
 </body>
 </html>
