@@ -457,7 +457,7 @@
       text-shadow: 0 0 8px #10B981;
     }
 
-    /* Bottom Arrow on Needle - REPLACED STAR WITH ARROW */
+    /* Bottom Arrow on Needle */
     .needle::after {
       content: '▼';
       position: absolute;
@@ -698,6 +698,58 @@
         bottom: -16px;
       }
     }
+
+    /* Install Banner - Auto hide animation */
+    .install-banner {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.9);
+      backdrop-filter: blur(20px);
+      padding: 12px 20px;
+      border-radius: 60px;
+      display: flex;
+      gap: 15px;
+      z-index: 200;
+      border: 1px solid rgba(212,175,55,0.5);
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      animation: slideUpFadeOut 2s ease-in-out forwards;
+      pointer-events: none;
+    }
+    
+    @keyframes slideUpFadeOut {
+      0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      70% {
+        opacity: 0.8;
+        transform: translateX(-50%) translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px);
+        visibility: hidden;
+        display: none;
+      }
+    }
+    
+    .install-banner button {
+      background: #D4AF37;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    
+    .install-banner.hide {
+      display: none;
+    }
   </style>
 </head>
 <body class="qibla-mode">
@@ -789,7 +841,7 @@
 </div>
 
 <script>
-  (function() {
+(function() {
     // ==================== COORDINATES ====================
     const KAABA_LAT = 21.422487;
     const KAABA_LON = 39.826206;
@@ -797,9 +849,9 @@
     const MADINA_LON = 39.6111;
     
     // ==================== CONFIGURATION ====================
-    const SMOOTHING_ALPHA = 0.25;
-    const LOCK_THRESHOLD = 4;
-    const UNLOCK_THRESHOLD = 10;
+    const SMOOTHING_ALPHA = 0.15;
+    const LOCK_THRESHOLD = 5;
+    const UNLOCK_THRESHOLD = 12;
     
     // ==================== STATE ====================
     let currentLat = null;
@@ -854,386 +906,412 @@
     const KABAH_IMAGE = 'images/kabah.png';
     const MADINA_IMAGE = 'images/madina.png';
     
+    // ==================== ANGLE NORMALIZATION ====================
+    function normalize(angle) {
+        return ((angle % 360) + 360) % 360;
+    }
+    
     // ==================== HELPER FUNCTIONS ====================
     function getDirectionName(degree) {
-      const directions = [
-        'North', 'North-East', 'East', 'South-East',
-        'South', 'South-West', 'West', 'North-West'
-      ];
-      const index = Math.round(((degree % 360) / 45)) % 8;
-      return directions[index];
+        const directions = ['North', 'North-East', 'East', 'South-East', 'South', 'South-West', 'West', 'North-West'];
+        const index = Math.round(((degree % 360) / 45)) % 8;
+        return directions[index];
     }
     
     function updateTopDirectionArrow(heading) {
-      if (!heading && heading !== 0) return;
-      
-      // Rotate the arrow to point in the direction user is facing
-      topDirectionArrow.style.transform = `rotate(${heading}deg)`;
-      
-      // Update text
-      const direction = getDirectionName(heading);
-      directionNameSpan.textContent = direction;
-      directionDegreeSpan.textContent = Math.round(heading) + '°';
+        if (heading === undefined || heading === null) return;
+        const normalizedHeading = normalize(heading);
+        topDirectionArrow.style.transform = `rotate(${normalizedHeading}deg)`;
+        directionNameSpan.textContent = getDirectionName(normalizedHeading);
+        directionDegreeSpan.textContent = Math.round(normalizedHeading) + '°';
     }
     
     function calculateAngle(lat, lon, targetLat, targetLon) {
-      const φ1 = lat * Math.PI / 180;
-      const φ2 = targetLat * Math.PI / 180;
-      const Δλ = (targetLon - lon) * Math.PI / 180;
-      
-      const y = Math.sin(Δλ) * Math.cos(φ2);
-      const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-      let bearing = Math.atan2(y, x) * 180 / Math.PI;
-      return (bearing + 360) % 360;
+        if (lat === null || lon === null) return 0;
+        
+        const φ1 = lat * Math.PI / 180;
+        const φ2 = targetLat * Math.PI / 180;
+        const Δλ = (targetLon - lon) * Math.PI / 180;
+        
+        const y = Math.sin(Δλ) * Math.cos(φ2);
+        const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+        let bearing = Math.atan2(y, x) * 180 / Math.PI;
+        
+        return normalize(bearing);
     }
     
     function updateTargetAngle() {
-      if (currentLat === null || currentLng === null) return;
-      
-      if (currentMode === 'qibla') {
-        targetAngle = calculateAngle(currentLat, currentLng, KAABA_LAT, KAABA_LON);
-      } else {
-        targetAngle = calculateAngle(currentLat, currentLng, MADINA_LAT, MADINA_LON);
-      }
-      if (targetAngleSpan) targetAngleSpan.textContent = Math.round(targetAngle);
-      if (debugTarget) debugTarget.textContent = Math.round(targetAngle);
+        if (currentLat === null || currentLng === null) return;
+        
+        if (currentMode === 'qibla') {
+            targetAngle = calculateAngle(currentLat, currentLng, KAABA_LAT, KAABA_LON);
+        } else {
+            targetAngle = calculateAngle(currentLat, currentLng, MADINA_LAT, MADINA_LON);
+        }
+        
+        targetAngle = normalize(targetAngle);
+        
+        if (targetAngleSpan) targetAngleSpan.textContent = Math.round(targetAngle);
+        if (debugTarget) debugTarget.textContent = Math.round(targetAngle);
     }
     
     function switchMode(mode) {
-      currentMode = mode;
-      
-      if (mode === 'qibla') {
-        document.body.classList.remove('madina-mode');
-        document.body.classList.add('qibla-mode');
-        markerImage.src = KABAH_IMAGE;
-        markerLabel.innerHTML = 'QIBLA';
-        targetIcon.innerHTML = '🕋';
-        targetName.innerHTML = 'Qibla';
-        qiblaModeBtn.classList.add('active');
-        madinaModeBtn.classList.remove('active');
-        if (debugMode) debugMode.textContent = 'Qibla';
-      } else {
-        document.body.classList.remove('qibla-mode');
-        document.body.classList.add('madina-mode');
-        markerImage.src = MADINA_IMAGE;
-        markerLabel.innerHTML = 'MASJID NABAWI';
-        targetIcon.innerHTML = '🕌';
-        targetName.innerHTML = 'Madina';
-        madinaModeBtn.classList.add('active');
-        qiblaModeBtn.classList.remove('active');
-        if (debugMode) debugMode.textContent = 'Madina';
-      }
-      
-      isLocked = false;
-      alignmentTriggered = false;
-      if (debugLock) debugLock.textContent = 'UNLOCKED';
-      
-      updateTargetAngle();
-      console.log(`[Mode] Switched to ${mode.toUpperCase()}`);
+        currentMode = mode;
+        
+        if (mode === 'qibla') {
+            document.body.classList.remove('madina-mode');
+            document.body.classList.add('qibla-mode');
+            markerImage.src = KABAH_IMAGE;
+            markerLabel.innerHTML = 'QIBLA';
+            targetIcon.innerHTML = '🕋';
+            targetName.innerHTML = 'Qibla';
+            qiblaModeBtn.classList.add('active');
+            madinaModeBtn.classList.remove('active');
+            if (debugMode) debugMode.textContent = 'Qibla';
+        } else {
+            document.body.classList.remove('qibla-mode');
+            document.body.classList.add('madina-mode');
+            markerImage.src = MADINA_IMAGE;
+            markerLabel.innerHTML = 'MASJID NABAWI';
+            targetIcon.innerHTML = '🕌';
+            targetName.innerHTML = 'Madina';
+            madinaModeBtn.classList.add('active');
+            qiblaModeBtn.classList.remove('active');
+            if (debugMode) debugMode.textContent = 'Madina';
+        }
+        
+        isLocked = false;
+        alignmentTriggered = false;
+        if (debugLock) debugLock.textContent = 'UNLOCKED';
+        
+        updateTargetAngle();
     }
     
     function smoothHeading(newHeading) {
-      if (lastFilteredHeading === null) {
-        lastFilteredHeading = newHeading;
-        return newHeading;
-      }
-      
-      let diff = newHeading - lastFilteredHeading;
-      if (diff > 180) diff -= 360;
-      if (diff < -180) diff += 360;
-      
-      let filtered = lastFilteredHeading + SMOOTHING_ALPHA * diff;
-      if (filtered < 0) filtered += 360;
-      if (filtered >= 360) filtered -= 360;
-      
-      lastFilteredHeading = filtered;
-      return filtered;
+        newHeading = normalize(newHeading);
+        
+        if (lastFilteredHeading === null) {
+            lastFilteredHeading = newHeading;
+            return newHeading;
+        }
+        
+        let diff = newHeading - lastFilteredHeading;
+        
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+        
+        let filtered = lastFilteredHeading + SMOOTHING_ALPHA * diff;
+        filtered = normalize(filtered);
+        
+        lastFilteredHeading = filtered;
+        return filtered;
     }
     
     function triggerAlignmentSuccess() {
-      if (alignmentTriggered) return;
-      alignmentTriggered = true;
-      
-      successAnimation.classList.remove('active');
-      void successAnimation.offsetWidth;
-      successAnimation.classList.add('active');
-      setTimeout(() => {
+        if (alignmentTriggered) return;
+        alignmentTriggered = true;
+        
         successAnimation.classList.remove('active');
-      }, 800);
-      
-      if (navigator.vibrate && Date.now() - lastVibrateTime > 1000) {
-        navigator.vibrate([100, 50, 100]);
-        lastVibrateTime = Date.now();
-      }
-      
-      if (currentMode === 'qibla') {
-        guidanceText.textContent = '✓ QIBLA FOUND ✓';
-      } else {
-        guidanceText.textContent = '✓ MADINA DIRECTION FOUND ✓';
-      }
-      guidanceText.classList.add('aligned');
-      
-      setTimeout(() => {
-        alignmentTriggered = false;
-      }, 2000);
+        void successAnimation.offsetWidth;
+        successAnimation.classList.add('active');
+        setTimeout(() => {
+            successAnimation.classList.remove('active');
+        }, 800);
+        
+        if (navigator.vibrate && Date.now() - lastVibrateTime > 1000) {
+            navigator.vibrate([100, 50, 100]);
+            lastVibrateTime = Date.now();
+        }
+        
+        if (currentMode === 'qibla') {
+            guidanceText.textContent = '✓ QIBLA FOUND ✓';
+        } else {
+            guidanceText.textContent = '✓ MADINA DIRECTION FOUND ✓';
+        }
+        guidanceText.classList.add('aligned');
+        
+        setTimeout(() => {
+            alignmentTriggered = false;
+        }, 2000);
     }
     
     function updateCompassDisplay() {
-      if (!sensorActive || targetAngle === null) return;
-      
-      const smoothed = smoothHeading(rawHeading);
-      filteredHeading = smoothed;
-      
-      // Update top direction arrow
-      updateTopDirectionArrow(filteredHeading);
-      
-      currentHeadingSpan.textContent = Math.round(filteredHeading);
-      
-      const needleRotation = -filteredHeading;
-      needleContainer.style.transform = `rotate(${needleRotation}deg)`;
-      
-      directionMarkerContainer.style.transform = `rotate(${targetAngle}deg)`;
-      
-      let deviation = (targetAngle - filteredHeading + 360) % 360;
-      if (deviation > 180) deviation = 360 - deviation;
-      
-      differenceSpan.textContent = Math.round(deviation);
-      const accuracyPercent = Math.max(0, 100 - (deviation / 1.8));
-      progressFill.style.width = `${accuracyPercent}%`;
-      
-      if (deviation <= LOCK_THRESHOLD) {
-        if (!isLocked) {
-          isLocked = true;
-          if (debugLock) debugLock.textContent = 'LOCKED ✓';
-          triggerAlignmentSuccess();
-        }
-        if (!alignmentTriggered) {
-          guidanceText.textContent = currentMode === 'qibla' ? '✓ QIBLA FOUND ✓' : '✓ MADINA DIRECTION FOUND ✓';
-          guidanceText.className = 'guidance-text aligned';
+        if (!sensorActive || targetAngle === null) return;
+        
+        const smoothed = smoothHeading(rawHeading);
+        filteredHeading = smoothed;
+        
+        updateTopDirectionArrow(filteredHeading);
+        
+        currentHeadingSpan.textContent = Math.round(filteredHeading);
+        
+        const needleRotation = -filteredHeading;
+        needleContainer.style.transform = `rotate(${needleRotation}deg)`;
+        
+        directionMarkerContainer.style.transform = `rotate(${targetAngle}deg)`;
+        
+        let rawDiff = normalize(targetAngle - filteredHeading);
+        let deviation = rawDiff;
+        if (deviation > 180) deviation = 360 - deviation;
+        
+        differenceSpan.textContent = Math.round(deviation);
+        const accuracyPercent = Math.max(0, 100 - (deviation / 1.8));
+        progressFill.style.width = `${accuracyPercent}%`;
+        
+        if (deviation <= LOCK_THRESHOLD) {
+            if (!isLocked) {
+                isLocked = true;
+                if (debugLock) debugLock.textContent = 'LOCKED ✓';
+                triggerAlignmentSuccess();
+            }
+            if (!alignmentTriggered) {
+                guidanceText.textContent = currentMode === 'qibla' ? '✓ QIBLA FOUND ✓' : '✓ MADINA DIRECTION FOUND ✓';
+                guidanceText.className = 'guidance-text aligned';
+            } else {
+                guidanceText.textContent = '✓ ALIGNED ✓';
+                guidanceText.className = 'guidance-text aligned';
+            }
         } else {
-          guidanceText.textContent = '✓ ALIGNED ✓';
-          guidanceText.className = 'guidance-text aligned';
-        }
-      } else {
-        if (isLocked && deviation >= UNLOCK_THRESHOLD) {
-          isLocked = false;
-          if (debugLock) debugLock.textContent = 'UNLOCKED';
+            if (isLocked && deviation >= UNLOCK_THRESHOLD) {
+                isLocked = false;
+                if (debugLock) debugLock.textContent = 'UNLOCKED';
+            }
+            
+            let guidance = '';
+            let guidanceClass = '';
+            
+            if (rawDiff <= 180) {
+                guidance = `↻ TURN RIGHT ${Math.round(rawDiff)}° towards ${currentMode === 'qibla' ? 'Qibla' : 'Madina'}`;
+                guidanceClass = 'right';
+            } else {
+                let leftTurn = 360 - rawDiff;
+                guidance = `↺ TURN LEFT ${Math.round(leftTurn)}° towards ${currentMode === 'qibla' ? 'Qibla' : 'Madina'}`;
+                guidanceClass = 'left';
+            }
+            
+            guidanceText.textContent = guidance;
+            guidanceText.className = `guidance-text ${guidanceClass}`;
         }
         
-        let rawDiff = (targetAngle - filteredHeading + 360) % 360;
-        let guidance = '';
-        let guidanceClass = '';
-        
-        if (rawDiff <= 180) {
-          guidance = `↻ TURN RIGHT ${Math.round(rawDiff)}° towards ${currentMode === 'qibla' ? 'Qibla' : 'Madina'}`;
-          guidanceClass = 'right';
-        } else {
-          let leftTurn = 360 - rawDiff;
-          guidance = `↺ TURN LEFT ${Math.round(leftTurn)}° towards ${currentMode === 'qibla' ? 'Qibla' : 'Madina'}`;
-          guidanceClass = 'left';
-        }
-        
-        guidanceText.textContent = guidance;
-        guidanceText.className = `guidance-text ${guidanceClass}`;
-      }
-      
-      if (debugRawHeading) debugRawHeading.textContent = Math.round(rawHeading);
-      if (debugFilteredHeading) debugFilteredHeading.textContent = Math.round(filteredHeading);
-      if (debugDeviation) debugDeviation.textContent = Math.round(deviation);
+        if (debugRawHeading) debugRawHeading.textContent = Math.round(rawHeading);
+        if (debugFilteredHeading) debugFilteredHeading.textContent = Math.round(filteredHeading);
+        if (debugDeviation) debugDeviation.textContent = Math.round(deviation);
     }
     
     function animate() {
-      updateCompassDisplay();
-      animationFrame = requestAnimationFrame(animate);
+        updateCompassDisplay();
+        animationFrame = requestAnimationFrame(animate);
     }
     
     // ==================== GPS ====================
     function startGPS() {
-      if (!navigator.geolocation) {
-        guidanceText.textContent = '❌ GPS not supported';
-        if (debugGps) debugGps.textContent = 'Not supported';
-        return;
-      }
-      
-      guidanceText.textContent = '📍 Requesting location...';
-      if (debugGps) debugGps.textContent = 'Requesting...';
-      
-      navigator.geolocation.watchPosition(
-        (position) => {
-          currentLat = position.coords.latitude;
-          currentLng = position.coords.longitude;
-          updateTargetAngle();
-          
-          const accuracy = position.coords.accuracy;
-          let accText = accuracy < 20 ? 'High ✅' : (accuracy < 80 ? 'Medium' : 'Low ⚠️');
-          if (debugGps) debugGps.textContent = `${currentLat.toFixed(4)}, ${currentLng.toFixed(4)} | Acc: ${Math.round(accuracy)}m (${accText})`;
-          
-          if (guidanceText.textContent.includes('Requesting')) {
-            guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
-          }
-        },
-        (error) => {
-          console.error('[GPS Error]', error);
-          if (debugGps) debugGps.textContent = `Error: ${error.message}`;
-          if (error.code === error.PERMISSION_DENIED) {
-            guidanceText.textContent = '❌ Location permission denied';
-          }
-        },
-        { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
-      );
+        if (!navigator.geolocation) {
+            guidanceText.textContent = '❌ GPS not supported';
+            if (debugGps) debugGps.textContent = 'Not supported';
+            return;
+        }
+        
+        guidanceText.textContent = '📍 Requesting location...';
+        if (debugGps) debugGps.textContent = 'Requesting...';
+        
+        navigator.geolocation.watchPosition(
+            (position) => {
+                currentLat = position.coords.latitude;
+                currentLng = position.coords.longitude;
+                updateTargetAngle();
+                
+                const accuracy = position.coords.accuracy;
+                let accText = accuracy < 20 ? 'High ✅' : (accuracy < 80 ? 'Medium' : 'Low ⚠️');
+                if (debugGps) debugGps.textContent = `${currentLat.toFixed(4)}, ${currentLng.toFixed(4)} | Acc: ${Math.round(accuracy)}m (${accText})`;
+                
+                if (guidanceText.textContent.includes('Requesting')) {
+                    guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
+                }
+            },
+            (error) => {
+                console.error('[GPS Error]', error);
+                if (debugGps) debugGps.textContent = `Error: ${error.message}`;
+                if (error.code === error.PERMISSION_DENIED) {
+                    guidanceText.textContent = '❌ Location permission denied';
+                }
+            },
+            { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
+        );
     }
     
-    // ==================== COMPASS ====================
+    // ==================== COMPASS HANDLING ====================
     function startCompass() {
-      if (!window.DeviceOrientationEvent) {
-        guidanceText.textContent = '❌ Compass not supported';
-        if (debugSensor) debugSensor.textContent = 'Not supported';
-        return;
-      }
-      
-      const handleOrientation = (event) => {
-        let heading = null;
-        
-        if (event.webkitCompassHeading !== undefined) {
-          heading = event.webkitCompassHeading;
-          if (debugSensor) debugSensor.textContent = 'iOS (webkit) ✓';
-        } else if (event.absolute === true && event.alpha !== null) {
-          heading = 360 - event.alpha;
-          if (debugSensor) debugSensor.textContent = 'Android (absolute) ✓';
-        } else if (event.alpha !== null) {
-          heading = 360 - event.alpha;
-          if (debugSensor) debugSensor.textContent = 'Relative ✓';
+        if (!window.DeviceOrientationEvent) {
+            guidanceText.textContent = '❌ Compass not supported';
+            if (debugSensor) debugSensor.textContent = 'Not supported';
+            return;
         }
         
-        if (heading !== null && !isNaN(heading)) {
-          rawHeading = heading;
-          if (!sensorActive) {
-            sensorActive = true;
-            if (guidanceText.textContent.includes('Requesting') || guidanceText.textContent.includes('Tap')) {
-              guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
+        function getScreenOrientationCorrection() {
+            const orientation = screen.orientation || screen.mozOrientation || screen.msOrientation;
+            let angle = 0;
+            if (orientation && typeof orientation.angle !== 'undefined') {
+                angle = orientation.angle;
+            } else if (window.orientation !== undefined) {
+                angle = window.orientation;
             }
-          }
+            return angle || 0;
         }
-      };
-      
-      if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        if (debugSensor) debugSensor.textContent = 'iOS - waiting for permission';
-        guidanceText.textContent = '📱 Tap anywhere to enable compass';
         
-        const requestPermission = () => {
-          DeviceOrientationEvent.requestPermission()
-            .then(response => {
-              if (response === 'granted') {
-                window.addEventListener('deviceorientation', handleOrientation);
-                sensorActive = true;
-                if (debugSensor) debugSensor.textContent = 'iOS - Granted ✓';
-                guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
-              } else {
-                if (debugSensor) debugSensor.textContent = 'iOS - Denied';
-              }
-            })
-            .catch(console.error);
+        const handleOrientation = (event) => {
+            let heading = null;
+            
+            if (event.webkitCompassHeading !== undefined) {
+                heading = event.webkitCompassHeading;
+                if (debugSensor) debugSensor.textContent = 'iOS (webkit) ✓';
+            } 
+            else if (event.absolute === true && event.alpha !== null) {
+                heading = event.alpha;
+                if (debugSensor) debugSensor.textContent = 'Android (absolute) ✓';
+            }
+            else if (event.alpha !== null) {
+                heading = event.alpha;
+                if (debugSensor) debugSensor.textContent = 'Relative (alpha)';
+            }
+            
+            if (heading !== null && !isNaN(heading)) {
+                let correctedHeading = heading - getScreenOrientationCorrection();
+                correctedHeading = normalize(correctedHeading);
+                
+                rawHeading = correctedHeading;
+                
+                if (!sensorActive) {
+                    sensorActive = true;
+                    if (guidanceText.textContent.includes('Requesting') || guidanceText.textContent.includes('Tap')) {
+                        guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
+                    }
+                }
+            }
         };
-        document.body.addEventListener('click', requestPermission, { once: true });
-      } else {
-        window.addEventListener('deviceorientationabsolute', handleOrientation);
-        window.addEventListener('deviceorientation', handleOrientation);
-        sensorActive = true;
-        if (debugSensor) debugSensor.textContent = 'Android - Active ✓';
-      }
+        
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            if (debugSensor) debugSensor.textContent = 'iOS - waiting for permission';
+            guidanceText.textContent = '📱 Tap anywhere to enable compass';
+            
+            const requestPermission = () => {
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                            sensorActive = true;
+                            if (debugSensor) debugSensor.textContent = 'iOS - Granted ✓';
+                            guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
+                        } else {
+                            if (debugSensor) debugSensor.textContent = 'iOS - Denied';
+                        }
+                    })
+                    .catch(console.error);
+            };
+            document.body.addEventListener('click', requestPermission, { once: true });
+        } else {
+            window.addEventListener('deviceorientationabsolute', handleOrientation);
+            window.addEventListener('deviceorientation', handleOrientation);
+            sensorActive = true;
+            if (debugSensor) debugSensor.textContent = 'Android - Active ✓';
+        }
+        
+        window.addEventListener('orientationchange', () => {
+            if (sensorActive) {
+                let tempHeading = rawHeading + getScreenOrientationCorrection();
+                rawHeading = normalize(tempHeading);
+            }
+        });
+        
+        if (screen.orientation) {
+            screen.orientation.addEventListener('change', () => {
+                if (sensorActive) {
+                    let tempHeading = rawHeading + getScreenOrientationCorrection();
+                    rawHeading = normalize(tempHeading);
+                }
+            });
+        }
     }
     
     // ==================== ACTIONS ====================
     function recalibrate() {
-      lastFilteredHeading = null;
-      guidanceText.textContent = '⟳ Calibrating... Move phone in figure-8 pattern';
-      setTimeout(() => {
-        if (sensorActive && currentLat) {
-          guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
-        }
-      }, 2500);
+        lastFilteredHeading = null;
+        alignmentTriggered = false;
+        isLocked = false;
+        guidanceText.textContent = '⟳ Calibrating... Move phone in figure-8 pattern';
+        setTimeout(() => {
+            if (sensorActive && currentLat) {
+                guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
+            }
+        }, 2500);
     }
     
     let debugVisible = false;
     function toggleDebug() {
-      debugVisible = !debugVisible;
-      debugPanel.classList.toggle('show', debugVisible);
+        debugVisible = !debugVisible;
+        debugPanel.classList.toggle('show', debugVisible);
     }
     
     function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
     }
     
-    // PWA Install
+    // ==================== PWA INSTALL - AUTO HIDE AFTER 2 SEC ====================
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const banner = document.createElement('div');
-      banner.className = 'install-banner';
-      banner.innerHTML = `<span>📱 Install App for easy access</span><button id="installAppBtn">Install</button>`;
-      document.body.appendChild(banner);
-      document.getElementById('installAppBtn').addEventListener('click', () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then(() => { banner.classList.add('hide'); });
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        const banner = document.createElement('div');
+        banner.className = 'install-banner';
+        banner.innerHTML = `<span>📱 Install App for easy access</span><button id="installAppBtn">Install</button>`;
+        document.body.appendChild(banner);
+        
+        const installBtn = document.getElementById('installAppBtn');
+        if (installBtn) {
+            installBtn.addEventListener('click', () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => {
+                        banner.style.display = 'none';
+                    });
+                }
+            });
         }
-      });
+        
+        // Auto hide banner after 2 seconds
+        setTimeout(() => {
+            if (banner && banner.parentNode) {
+                banner.style.opacity = '0';
+                banner.style.transform = 'translateX(-50%) translateY(-30px)';
+                setTimeout(() => {
+                    if (banner && banner.parentNode) {
+                        banner.remove();
+                    }
+                }, 500);
+            }
+        }, 2000);
     });
     
     // ==================== INIT ====================
     function init() {
-      startGPS();
-      startCompass();
-      animate();
-      
-      qiblaModeBtn.addEventListener('click', () => switchMode('qibla'));
-      madinaModeBtn.addEventListener('click', () => switchMode('madina'));
-      recalBtn.addEventListener('click', recalibrate);
-      debugBtn.addEventListener('click', toggleDebug);
-      fullscreenBtn.addEventListener('click', toggleFullscreen);
-      
-      console.log('[App] Dual Mode Qibla & Madina Compass with Top Direction Arrow & Bottom Needle Arrow - Ready');
+        startGPS();
+        startCompass();
+        animate();
+        
+        qiblaModeBtn.addEventListener('click', () => switchMode('qibla'));
+        madinaModeBtn.addEventListener('click', () => switchMode('madina'));
+        recalBtn.addEventListener('click', recalibrate);
+        debugBtn.addEventListener('click', toggleDebug);
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
     }
     
     init();
-  })();
+})();
 </script>
-
-<style>
-  .install-banner {
-    position: fixed;
-    bottom: 90px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.9);
-    backdrop-filter: blur(20px);
-    padding: 12px 20px;
-    border-radius: 60px;
-    display: flex;
-    gap: 15px;
-    z-index: 200;
-    border: 1px solid rgba(212,175,55,0.5);
-    font-size: 0.8rem;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .install-banner button {
-    background: #D4AF37;
-    border: none;
-    padding: 6px 16px;
-    border-radius: 40px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  .install-banner.hide {
-    display: none;
-  }
-</style>
 
 <script>
   if ('serviceWorker' in navigator) {
