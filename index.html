@@ -23,7 +23,6 @@
       user-select: none;
     }
 
-    /* Base Styles */
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
       min-height: 100vh;
@@ -118,7 +117,6 @@
       color: #10B981;
     }
 
-    /* Common Styles */
     .bg-pattern {
       position: fixed;
       inset: 0;
@@ -140,7 +138,7 @@
       padding: 20px;
     }
 
-    /* Mode Switch Buttons */
+    /* Mode Switch Buttons WITH IMAGES */
     .mode-switch {
       position: fixed;
       top: 20px;
@@ -167,6 +165,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      font-family: inherit;
     }
 
     .mode-btn img {
@@ -227,7 +226,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.1s linear;
+      transition: transform 0.05s linear;
     }
 
     .direction-arrow svg {
@@ -262,15 +261,6 @@
       font-size: 0.8rem;
       opacity: 0.8;
       margin-left: 8px;
-    }
-
-    @keyframes arrowPulse {
-      0%, 100% { opacity: 0.7; }
-      50% { opacity: 1; }
-    }
-
-    .direction-arrow {
-      animation: arrowPulse 1.5s infinite;
     }
 
     /* Compass Wrapper */
@@ -314,7 +304,6 @@
       border: 1px dashed;
     }
 
-    /* Direction Labels */
     .dir-label {
       position: absolute;
       font-weight: bold;
@@ -345,7 +334,7 @@
       color: #10B981;
     }
 
-    /* Direction Marker Container - For Images */
+    /* Direction Marker Container WITH IMAGE */
     .direction-marker-container {
       position: absolute;
       inset: -8px;
@@ -362,7 +351,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: all 0.3s ease;
     }
 
     .marker-image {
@@ -424,11 +412,10 @@
     }
 
     .needle {
-      width: 5px;
+      width: 4px;
       height: 135px;
-      border-radius: 5px;
+      border-radius: 4px;
       position: relative;
-      transition: all 0.3s ease;
     }
 
     @media (max-width: 480px) {
@@ -437,14 +424,14 @@
       }
     }
 
-    /* Top circle on needle */
     .needle::before {
-      content: '⬤';
+      content: '▲';
       position: absolute;
-      top: -18px;
+      top: -22px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 16px;
+      font-size: 20px;
+      font-weight: bold;
     }
 
     body.qibla-mode .needle::before {
@@ -457,11 +444,10 @@
       text-shadow: 0 0 8px #10B981;
     }
 
-    /* Bottom Arrow on Needle */
     .needle::after {
       content: '▼';
       position: absolute;
-      bottom: -20px;
+      bottom: -22px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 18px;
@@ -478,46 +464,27 @@
       text-shadow: 0 0 6px #10B981;
     }
 
-    .north-indicator {
-      position: absolute;
-      top: -28px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    body.qibla-mode .north-indicator {
-      color: #D4AF37;
-    }
-
-    body.madina-mode .north-indicator {
-      color: #10B981;
-    }
-
-    /* Center Jewel */
     .center-jewel {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       transform: translate(-50%, -50%);
       z-index: 15;
-      transition: all 0.3s ease;
       animation: jewelPulse 1.5s infinite;
     }
 
     @keyframes jewelPulse {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); }
-      50% { transform: translate(-50%, -50%) scale(1.1); }
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+      50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
     }
 
-    /* Alignment Success Animation */
+    /* Success Animation */
     @keyframes successRing {
       0% { transform: scale(1); opacity: 0.8; }
-      100% { transform: scale(1.3); opacity: 0; }
+      100% { transform: scale(1.4); opacity: 0; }
     }
 
     .success-animation {
@@ -529,15 +496,15 @@
     }
 
     .success-animation.active {
-      animation: successRing 0.8s ease-out forwards;
+      animation: successRing 0.6s ease-out forwards;
     }
 
     body.qibla-mode .success-animation.active {
-      box-shadow: 0 0 0 20px rgba(212, 175, 55, 0.5);
+      box-shadow: 0 0 0 20px rgba(212, 175, 55, 0.4);
     }
 
     body.madina-mode .success-animation.active {
-      box-shadow: 0 0 0 20px rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 0 20px rgba(16, 185, 129, 0.4);
     }
 
     /* Info Panel */
@@ -596,7 +563,7 @@
     .progress-fill {
       width: 0%;
       height: 100%;
-      transition: width 0.08s linear, background 0.3s ease;
+      transition: width 0.05s linear, background 0.3s ease;
     }
 
     .action-buttons {
@@ -615,6 +582,7 @@
       cursor: pointer;
       text-align: center;
       transition: all 0.2s;
+      font-family: inherit;
     }
 
     body.qibla-mode .btn-sm {
@@ -631,7 +599,6 @@
       transform: scale(0.96);
     }
 
-    /* Debug Panel */
     .debug-panel {
       position: fixed;
       top: 140px;
@@ -693,13 +660,8 @@
       .direction-text {
         font-size: 0.75rem;
       }
-      .needle::after {
-        font-size: 14px;
-        bottom: -16px;
-      }
     }
 
-    /* Install Banner - Auto hide animation */
     .install-banner {
       position: fixed;
       bottom: 90px;
@@ -721,20 +683,9 @@
     }
     
     @keyframes slideUpFadeOut {
-      0% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-      70% {
-        opacity: 0.8;
-        transform: translateX(-50%) translateY(0);
-      }
-      100% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-30px);
-        visibility: hidden;
-        display: none;
-      }
+      0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      70% { opacity: 0.8; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-30px); visibility: hidden; display: none; }
     }
     
     .install-banner button {
@@ -755,18 +706,15 @@
 <body class="qibla-mode">
 <div class="bg-pattern"></div>
 
-
-
 <div class="container">
-  <!-- Mode Switch -->
   <div class="mode-switch">
     <button class="mode-btn qibla active" id="qiblaModeBtn">
       <img src="images/kabah.png" alt="Kabah" id="kabahIconBtn" onerror="this.style.display='none'; this.nextSibling.style.display='inline'">
-      <span>QIBLA MODE</span>
+      <span>QIBLA</span>
     </button>
     <button class="mode-btn madina" id="madinaModeBtn">
       <img src="images/madina.png" alt="Madina" id="madinaIconBtn" onerror="this.style.display='none'; this.nextSibling.style.display='inline'">
-      <span>MADINA MODE</span>
+      <span>MADINA</span>
     </button>
   </div>
 
@@ -775,7 +723,6 @@
     <div class="compass-inner"></div>
     <div class="compass-inner-2"></div>
     
-    <!-- Degree Marks -->
     <div class="degree-mark" style="top: 8px; left: 50%; transform: translateX(-50%);">N</div>
     <div class="degree-mark" style="bottom: 8px; left: 50%; transform: translateX(-50%);">S</div>
     <div class="degree-mark" style="left: 10px; top: 50%; transform: translateY(-50%);">W</div>
@@ -785,7 +732,6 @@
     <div class="degree-mark" style="left: 25%; top: 50%; transform: translateY(-50%);">NW</div>
     <div class="degree-mark" style="right: 25%; top: 50%; transform: translateY(-50%);">SE</div>
     
-    <!-- Direction Marker Container with Image -->
     <div class="direction-marker-container" id="directionMarkerContainer">
       <div class="direction-marker" id="directionMarker">
         <img class="marker-image" id="markerImage" src="images/kabah.png" alt="Kabah" onerror="this.style.display='none'; this.nextSibling.style.display='flex'; this.nextSibling.innerHTML='🕋'">
@@ -793,28 +739,24 @@
       </div>
     </div>
     
-    <!-- Needle -->
     <div class="needle-container" id="needleContainer">
       <div class="needle"></div>
-      <div class="north-indicator">N</div>
     </div>
     
     <div class="center-jewel"></div>
     <div class="success-animation" id="successAnimation"></div>
     
-    <!-- Direction Labels -->
     <div class="dir-label" style="top: -35px; left: 50%; transform: translateX(-50%);">⬆️ NORTH</div>
     <div class="dir-label" style="bottom: -35px; left: 50%; transform: translateX(-50%);">⬇️ SOUTH</div>
     <div class="dir-label" style="left: -45px; top: 50%; transform: translateY(-50%);">⬅️ WEST</div>
     <div class="dir-label" style="right: -45px; top: 50%; transform: translateY(-50%);">➡️ EAST</div>
   </div>
   
-  <!-- Info Panel -->
   <div class="info-panel">
     <div class="guidance-text" id="guidanceText">📍 Acquiring location...</div>
     <div class="angles">
-      <span>🧭 Your heading: <span class="angle-value" id="currentHeading">---</span>°</span>
-      <span><span id="targetIcon">🕋</span> <span id="targetName">Qibla</span>: <span class="angle-value" id="targetAngle">---</span>°</span>
+      <span>🧭 Heading: <span class="angle-value" id="currentHeading">---</span>°</span>
+      <span>🎯 <span id="targetName">Qibla</span>: <span class="angle-value" id="targetAngle">---</span>°</span>
       <span>📐 Difference: <span class="angle-value" id="difference">---</span>°</span>
     </div>
     <div class="progress-container">
@@ -827,14 +769,13 @@
     </div>
   </div>
   
-  <!-- Debug Panel -->
   <div class="debug-panel" id="debugPanel">
     <div class="debug-line">📍 GPS: <span id="debugGps">---</span></div>
     <div class="debug-line">🧭 Raw Heading: <span id="debugRawHeading">---</span>°</div>
     <div class="debug-line">🧭 Filtered Heading: <span id="debugFilteredHeading">---</span>°</div>
-    <div class="debug-line">🎯 Target Angle: <span id="debugTarget">---</span>°</div>
+    <div class="debug-line">🎯 Target: <span id="debugTarget">---</span>°</div>
     <div class="debug-line">📐 Deviation: <span id="debugDeviation">---</span>°</div>
-    <div class="debug-line">🔒 Lock State: <span id="debugLock">---</span></div>
+    <div class="debug-line">🔒 Lock: <span id="debugLock">---</span></div>
     <div class="debug-line">📡 Sensor: <span id="debugSensor">---</span></div>
     <div class="debug-line">🎨 Mode: <span id="debugMode">Qibla</span></div>
   </div>
@@ -842,57 +783,43 @@
 
 <script>
 (function() {
-    // ==================== COORDINATES ====================
     const KAABA_LAT = 21.422487;
     const KAABA_LON = 39.826206;
     const MADINA_LAT = 24.4672;
     const MADINA_LON = 39.6111;
     
-    // ==================== CONFIGURATION ====================
-    const SMOOTHING_ALPHA = 0.15;
-    const LOCK_THRESHOLD = 5;
-    const UNLOCK_THRESHOLD = 12;
-    
-    // ==================== STATE ====================
     let currentLat = null;
     let currentLng = null;
     let currentMode = 'qibla';
-    let targetAngle = null;
-    let rawHeading = 0;
-    let filteredHeading = 0;
+    let targetAngle = 0;
+    let currentHeading = 0;
     let sensorActive = false;
-    let isLocked = false;
-    let lastFilteredHeading = null;
+    let isAligned = false;
     let lastVibrateTime = 0;
-    let alignmentTriggered = false;
-    let animationFrame = null;
+    let lastHeading = 0;
     
-    // ==================== DOM ELEMENTS ====================
+    // DOM Elements
     const needleContainer = document.getElementById('needleContainer');
     const directionMarkerContainer = document.getElementById('directionMarkerContainer');
     const markerImage = document.getElementById('markerImage');
     const markerLabel = document.getElementById('markerLabel');
-    const targetIcon = document.getElementById('targetIcon');
-    const targetName = document.getElementById('targetName');
+    const targetNameSpan = document.getElementById('targetName');
     const guidanceText = document.getElementById('guidanceText');
     const currentHeadingSpan = document.getElementById('currentHeading');
     const targetAngleSpan = document.getElementById('targetAngle');
     const differenceSpan = document.getElementById('difference');
     const progressFill = document.getElementById('progressFill');
     const successAnimation = document.getElementById('successAnimation');
+    const topDirectionArrow = document.getElementById('topDirectionArrow');
+    const directionNameSpan = document.getElementById('directionName');
+    const directionDegreeSpan = document.getElementById('directionDegree');
+    const qiblaModeBtn = document.getElementById('qiblaModeBtn');
+    const madinaModeBtn = document.getElementById('madinaModeBtn');
     const recalBtn = document.getElementById('recalBtn');
     const debugBtn = document.getElementById('debugBtn');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     const debugPanel = document.getElementById('debugPanel');
-    const qiblaModeBtn = document.getElementById('qiblaModeBtn');
-    const madinaModeBtn = document.getElementById('madinaModeBtn');
     
-    // Top direction arrow elements
-    const topDirectionArrow = document.getElementById('topDirectionArrow');
-    const directionNameSpan = document.getElementById('directionName');
-    const directionDegreeSpan = document.getElementById('directionDegree');
-    
-    // Debug elements
     const debugGps = document.getElementById('debugGps');
     const debugRawHeading = document.getElementById('debugRawHeading');
     const debugFilteredHeading = document.getElementById('debugFilteredHeading');
@@ -902,57 +829,57 @@
     const debugSensor = document.getElementById('debugSensor');
     const debugMode = document.getElementById('debugMode');
     
-    // ==================== IMAGE PATHS ====================
     const KABAH_IMAGE = 'images/kabah.png';
     const MADINA_IMAGE = 'images/madina.png';
     
-    // ==================== ANGLE NORMALIZATION ====================
     function normalize(angle) {
         return ((angle % 360) + 360) % 360;
     }
     
-    // ==================== HELPER FUNCTIONS ====================
     function getDirectionName(degree) {
         const directions = ['North', 'North-East', 'East', 'South-East', 'South', 'South-West', 'West', 'North-West'];
-        const index = Math.round(((degree % 360) / 45)) % 8;
+        const index = Math.round((normalize(degree) / 45)) % 8;
         return directions[index];
     }
     
-    function updateTopDirectionArrow(heading) {
-        if (heading === undefined || heading === null) return;
-        const normalizedHeading = normalize(heading);
-        topDirectionArrow.style.transform = `rotate(${normalizedHeading}deg)`;
-        directionNameSpan.textContent = getDirectionName(normalizedHeading);
-        directionDegreeSpan.textContent = Math.round(normalizedHeading) + '°';
-    }
-    
-    function calculateAngle(lat, lon, targetLat, targetLon) {
-        if (lat === null || lon === null) return 0;
-        
+    function calculateQiblaAngle(lat, lon) {
         const φ1 = lat * Math.PI / 180;
-        const φ2 = targetLat * Math.PI / 180;
-        const Δλ = (targetLon - lon) * Math.PI / 180;
-        
+        const φ2 = KAABA_LAT * Math.PI / 180;
+        const Δλ = (KAABA_LON - lon) * Math.PI / 180;
         const y = Math.sin(Δλ) * Math.cos(φ2);
         const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
         let bearing = Math.atan2(y, x) * 180 / Math.PI;
-        
         return normalize(bearing);
     }
     
-    function updateTargetAngle() {
+    function calculateMadinaAngle(lat, lon) {
+        const φ1 = lat * Math.PI / 180;
+        const φ2 = MADINA_LAT * Math.PI / 180;
+        const Δλ = (MADINA_LON - lon) * Math.PI / 180;
+        const y = Math.sin(Δλ) * Math.cos(φ2);
+        const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+        let bearing = Math.atan2(y, x) * 180 / Math.PI;
+        return normalize(bearing);
+    }
+    
+    function updateTarget() {
         if (currentLat === null || currentLng === null) return;
         
         if (currentMode === 'qibla') {
-            targetAngle = calculateAngle(currentLat, currentLng, KAABA_LAT, KAABA_LON);
+            targetAngle = calculateQiblaAngle(currentLat, currentLng);
+            markerImage.src = KABAH_IMAGE;
+            markerLabel.textContent = 'QIBLA';
+            targetNameSpan.textContent = 'Qibla';
         } else {
-            targetAngle = calculateAngle(currentLat, currentLng, MADINA_LAT, MADINA_LON);
+            targetAngle = calculateMadinaAngle(currentLat, currentLng);
+            markerImage.src = MADINA_IMAGE;
+            markerLabel.textContent = 'MASJID NABAWI';
+            targetNameSpan.textContent = 'Madina';
         }
         
-        targetAngle = normalize(targetAngle);
-        
-        if (targetAngleSpan) targetAngleSpan.textContent = Math.round(targetAngle);
-        if (debugTarget) debugTarget.textContent = Math.round(targetAngle);
+        targetAngleSpan.textContent = Math.round(targetAngle);
+        debugTarget.textContent = Math.round(targetAngle);
+        directionMarkerContainer.style.transform = `rotate(${targetAngle}deg)`;
     }
     
     function switchMode(mode) {
@@ -961,201 +888,139 @@
         if (mode === 'qibla') {
             document.body.classList.remove('madina-mode');
             document.body.classList.add('qibla-mode');
-            markerImage.src = KABAH_IMAGE;
-            markerLabel.innerHTML = 'QIBLA';
-            targetIcon.innerHTML = '🕋';
-            targetName.innerHTML = 'Qibla';
             qiblaModeBtn.classList.add('active');
             madinaModeBtn.classList.remove('active');
-            if (debugMode) debugMode.textContent = 'Qibla';
+            debugMode.textContent = 'Qibla';
         } else {
             document.body.classList.remove('qibla-mode');
             document.body.classList.add('madina-mode');
-            markerImage.src = MADINA_IMAGE;
-            markerLabel.innerHTML = 'MASJID NABAWI';
-            targetIcon.innerHTML = '🕌';
-            targetName.innerHTML = 'Madina';
             madinaModeBtn.classList.add('active');
             qiblaModeBtn.classList.remove('active');
-            if (debugMode) debugMode.textContent = 'Madina';
+            debugMode.textContent = 'Madina';
         }
         
-        isLocked = false;
-        alignmentTriggered = false;
-        if (debugLock) debugLock.textContent = 'UNLOCKED';
-        
-        updateTargetAngle();
+        isAligned = false;
+        debugLock.textContent = '---';
+        updateTarget();
     }
     
-    function smoothHeading(newHeading) {
-        newHeading = normalize(newHeading);
-        
-        if (lastFilteredHeading === null) {
-            lastFilteredHeading = newHeading;
-            return newHeading;
+    function triggerVibration() {
+        const now = Date.now();
+        if (navigator.vibrate && now - lastVibrateTime > 1500) {
+            navigator.vibrate(200);
+            lastVibrateTime = now;
         }
-        
-        let diff = newHeading - lastFilteredHeading;
-        
-        if (diff > 180) diff -= 360;
-        if (diff < -180) diff += 360;
-        
-        let filtered = lastFilteredHeading + SMOOTHING_ALPHA * diff;
-        filtered = normalize(filtered);
-        
-        lastFilteredHeading = filtered;
-        return filtered;
     }
     
-    function triggerAlignmentSuccess() {
-        if (alignmentTriggered) return;
-        alignmentTriggered = true;
-        
-        successAnimation.classList.remove('active');
-        void successAnimation.offsetWidth;
-        successAnimation.classList.add('active');
-        setTimeout(() => {
-            successAnimation.classList.remove('active');
-        }, 800);
-        
-        if (navigator.vibrate && Date.now() - lastVibrateTime > 1000) {
-            navigator.vibrate([100, 50, 100]);
-            lastVibrateTime = Date.now();
-        }
-        
-        if (currentMode === 'qibla') {
-            guidanceText.textContent = '✓ QIBLA FOUND ✓';
-        } else {
-            guidanceText.textContent = '✓ MADINA DIRECTION FOUND ✓';
-        }
-        guidanceText.classList.add('aligned');
-        
-        setTimeout(() => {
-            alignmentTriggered = false;
-        }, 2000);
-    }
-    
-    function updateCompassDisplay() {
+    function updateCompass(heading) {
         if (!sensorActive || targetAngle === null) return;
         
-        const smoothed = smoothHeading(rawHeading);
-        filteredHeading = smoothed;
+        currentHeading = normalize(heading);
         
-        updateTopDirectionArrow(filteredHeading);
+        // Update displays
+        currentHeadingSpan.textContent = Math.round(currentHeading);
+        directionDegreeSpan.textContent = Math.round(currentHeading) + '°';
+        directionNameSpan.textContent = getDirectionName(currentHeading);
         
-        currentHeadingSpan.textContent = Math.round(filteredHeading);
+        // Rotate needle (opposite direction to show north)
+        needleContainer.style.transform = `rotate(${-currentHeading}deg)`;
         
-        const needleRotation = -filteredHeading;
-        needleContainer.style.transform = `rotate(${needleRotation}deg)`;
+        // Rotate top arrow
+        topDirectionArrow.style.transform = `rotate(${currentHeading}deg)`;
         
-        directionMarkerContainer.style.transform = `rotate(${targetAngle}deg)`;
-        
-        let rawDiff = normalize(targetAngle - filteredHeading);
-        let deviation = rawDiff;
-        if (deviation > 180) deviation = 360 - deviation;
+        // Calculate deviation
+        let rawDiff = normalize(targetAngle - currentHeading);
+        let deviation = rawDiff > 180 ? 360 - rawDiff : rawDiff;
         
         differenceSpan.textContent = Math.round(deviation);
-        const accuracyPercent = Math.max(0, 100 - (deviation / 1.8));
-        progressFill.style.width = `${accuracyPercent}%`;
+        let accuracy = Math.max(0, 100 - (deviation * 1.5));
+        progressFill.style.width = `${Math.min(100, accuracy)}%`;
         
-        if (deviation <= LOCK_THRESHOLD) {
-            if (!isLocked) {
-                isLocked = true;
-                if (debugLock) debugLock.textContent = 'LOCKED ✓';
-                triggerAlignmentSuccess();
-            }
-            if (!alignmentTriggered) {
-                guidanceText.textContent = currentMode === 'qibla' ? '✓ QIBLA FOUND ✓' : '✓ MADINA DIRECTION FOUND ✓';
-                guidanceText.className = 'guidance-text aligned';
+        // Check alignment (within 5 degrees)
+        if (deviation <= 5) {
+            if (!isAligned) {
+                isAligned = true;
+                debugLock.textContent = 'ALIGNED ✓';
+                triggerVibration();
+                
+                successAnimation.classList.remove('active');
+                void successAnimation.offsetWidth;
+                successAnimation.classList.add('active');
+                
+                if (currentMode === 'qibla') {
+                    guidanceText.textContent = '✓ QIBLA FOUND ✓';
+                } else {
+                    guidanceText.textContent = '✓ MADINA FOUND ✓';
+                }
+                guidanceText.classList.add('aligned');
+                
+                setTimeout(() => {
+                    successAnimation.classList.remove('active');
+                }, 600);
             } else {
                 guidanceText.textContent = '✓ ALIGNED ✓';
-                guidanceText.className = 'guidance-text aligned';
+                guidanceText.classList.add('aligned');
             }
         } else {
-            if (isLocked && deviation >= UNLOCK_THRESHOLD) {
-                isLocked = false;
-                if (debugLock) debugLock.textContent = 'UNLOCKED';
+            if (isAligned) {
+                isAligned = false;
+                debugLock.textContent = '---';
             }
-            
-            let guidance = '';
-            let guidanceClass = '';
             
             if (rawDiff <= 180) {
-                guidance = `↻ TURN RIGHT ${Math.round(rawDiff)}° towards ${currentMode === 'qibla' ? 'Qibla' : 'Madina'}`;
-                guidanceClass = 'right';
+                guidanceText.textContent = `↻ TURN RIGHT ${Math.round(rawDiff)}°`;
+                guidanceText.className = 'guidance-text right';
             } else {
                 let leftTurn = 360 - rawDiff;
-                guidance = `↺ TURN LEFT ${Math.round(leftTurn)}° towards ${currentMode === 'qibla' ? 'Qibla' : 'Madina'}`;
-                guidanceClass = 'left';
+                guidanceText.textContent = `↺ TURN LEFT ${Math.round(leftTurn)}°`;
+                guidanceText.className = 'guidance-text left';
             }
-            
-            guidanceText.textContent = guidance;
-            guidanceText.className = `guidance-text ${guidanceClass}`;
         }
         
-        if (debugRawHeading) debugRawHeading.textContent = Math.round(rawHeading);
-        if (debugFilteredHeading) debugFilteredHeading.textContent = Math.round(filteredHeading);
-        if (debugDeviation) debugDeviation.textContent = Math.round(deviation);
+        debugRawHeading.textContent = Math.round(heading);
+        debugFilteredHeading.textContent = Math.round(currentHeading);
+        debugDeviation.textContent = Math.round(deviation);
     }
     
-    function animate() {
-        updateCompassDisplay();
-        animationFrame = requestAnimationFrame(animate);
-    }
-    
-    // ==================== GPS ====================
+    // GPS
     function startGPS() {
         if (!navigator.geolocation) {
             guidanceText.textContent = '❌ GPS not supported';
-            if (debugGps) debugGps.textContent = 'Not supported';
             return;
         }
         
-        guidanceText.textContent = '📍 Requesting location...';
-        if (debugGps) debugGps.textContent = 'Requesting...';
+        guidanceText.textContent = '📍 Getting location...';
         
         navigator.geolocation.watchPosition(
             (position) => {
                 currentLat = position.coords.latitude;
                 currentLng = position.coords.longitude;
-                updateTargetAngle();
+                updateTarget();
                 
-                const accuracy = position.coords.accuracy;
-                let accText = accuracy < 20 ? 'High ✅' : (accuracy < 80 ? 'Medium' : 'Low ⚠️');
-                if (debugGps) debugGps.textContent = `${currentLat.toFixed(4)}, ${currentLng.toFixed(4)} | Acc: ${Math.round(accuracy)}m (${accText})`;
+                let accuracy = position.coords.accuracy;
+                debugGps.textContent = `${currentLat.toFixed(4)}, ${currentLng.toFixed(4)} | ±${Math.round(accuracy)}m`;
                 
-                if (guidanceText.textContent.includes('Requesting')) {
-                    guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
+                if (guidanceText.textContent.includes('Getting')) {
+                    guidanceText.textContent = '🎯 Turn phone to align';
                 }
             },
             (error) => {
-                console.error('[GPS Error]', error);
-                if (debugGps) debugGps.textContent = `Error: ${error.message}`;
-                if (error.code === error.PERMISSION_DENIED) {
+                console.error(error);
+                debugGps.textContent = `Error: ${error.message}`;
+                if (error.code === 1) {
                     guidanceText.textContent = '❌ Location permission denied';
                 }
             },
-            { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
+            { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
         );
     }
     
-    // ==================== COMPASS HANDLING ====================
+    // Compass sensor
     function startCompass() {
         if (!window.DeviceOrientationEvent) {
             guidanceText.textContent = '❌ Compass not supported';
-            if (debugSensor) debugSensor.textContent = 'Not supported';
+            debugSensor.textContent = 'Not supported';
             return;
-        }
-        
-        function getScreenOrientationCorrection() {
-            const orientation = screen.orientation || screen.mozOrientation || screen.msOrientation;
-            let angle = 0;
-            if (orientation && typeof orientation.angle !== 'undefined') {
-                angle = orientation.angle;
-            } else if (window.orientation !== undefined) {
-                angle = window.orientation;
-            }
-            return angle || 0;
         }
         
         const handleOrientation = (event) => {
@@ -1163,35 +1028,32 @@
             
             if (event.webkitCompassHeading !== undefined) {
                 heading = event.webkitCompassHeading;
-                if (debugSensor) debugSensor.textContent = 'iOS (webkit) ✓';
-            } 
-            else if (event.absolute === true && event.alpha !== null) {
-                heading = event.alpha;
-                if (debugSensor) debugSensor.textContent = 'Android (absolute) ✓';
-            }
-            else if (event.alpha !== null) {
-                heading = event.alpha;
-                if (debugSensor) debugSensor.textContent = 'Relative (alpha)';
+                debugSensor.textContent = 'iOS ✓';
+            } else if (event.alpha !== null) {
+                heading = 360 - event.alpha;
+                debugSensor.textContent = 'Android ✓';
             }
             
             if (heading !== null && !isNaN(heading)) {
-                let correctedHeading = heading - getScreenOrientationCorrection();
-                correctedHeading = normalize(correctedHeading);
+                heading = normalize(heading);
                 
-                rawHeading = correctedHeading;
+                // Simple smoothing
+                let smoothed = lastHeading === 0 ? heading : lastHeading * 0.7 + heading * 0.3;
+                lastHeading = smoothed;
                 
                 if (!sensorActive) {
                     sensorActive = true;
-                    if (guidanceText.textContent.includes('Requesting') || guidanceText.textContent.includes('Tap')) {
-                        guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
-                    }
+                    guidanceText.textContent = '🎯 Turn phone to align';
                 }
+                
+                updateCompass(smoothed);
             }
         };
         
+        // iOS permission
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-            if (debugSensor) debugSensor.textContent = 'iOS - waiting for permission';
-            guidanceText.textContent = '📱 Tap anywhere to enable compass';
+            debugSensor.textContent = 'Tap to enable';
+            guidanceText.textContent = '📱 Tap for compass';
             
             const requestPermission = () => {
                 DeviceOrientationEvent.requestPermission()
@@ -1199,10 +1061,10 @@
                         if (response === 'granted') {
                             window.addEventListener('deviceorientation', handleOrientation);
                             sensorActive = true;
-                            if (debugSensor) debugSensor.textContent = 'iOS - Granted ✓';
-                            guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
+                            debugSensor.textContent = 'iOS - Active ✓';
+                            guidanceText.textContent = '🎯 Turn phone to align';
                         } else {
-                            if (debugSensor) debugSensor.textContent = 'iOS - Denied';
+                            debugSensor.textContent = 'iOS - Denied';
                         }
                     })
                     .catch(console.error);
@@ -1212,37 +1074,18 @@
             window.addEventListener('deviceorientationabsolute', handleOrientation);
             window.addEventListener('deviceorientation', handleOrientation);
             sensorActive = true;
-            if (debugSensor) debugSensor.textContent = 'Android - Active ✓';
-        }
-        
-        window.addEventListener('orientationchange', () => {
-            if (sensorActive) {
-                let tempHeading = rawHeading + getScreenOrientationCorrection();
-                rawHeading = normalize(tempHeading);
-            }
-        });
-        
-        if (screen.orientation) {
-            screen.orientation.addEventListener('change', () => {
-                if (sensorActive) {
-                    let tempHeading = rawHeading + getScreenOrientationCorrection();
-                    rawHeading = normalize(tempHeading);
-                }
-            });
+            debugSensor.textContent = 'Active ✓';
         }
     }
     
-    // ==================== ACTIONS ====================
     function recalibrate() {
-        lastFilteredHeading = null;
-        alignmentTriggered = false;
-        isLocked = false;
-        guidanceText.textContent = '⟳ Calibrating... Move phone in figure-8 pattern';
+        lastHeading = 0;
+        guidanceText.textContent = '⟳ Calibrating... Move phone in 8 pattern';
         setTimeout(() => {
             if (sensorActive && currentLat) {
-                guidanceText.textContent = `🎯 Turn to align with ${currentMode === 'qibla' ? 'Qibla' : 'Madina'} marker`;
+                guidanceText.textContent = '🎯 Turn phone to align';
             }
-        }, 2500);
+        }, 2000);
     }
     
     let debugVisible = false;
@@ -1259,7 +1102,7 @@
         }
     }
     
-    // ==================== PWA INSTALL - AUTO HIDE AFTER 2 SEC ====================
+    // PWA install banner (auto hide after 2 sec)
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -1267,7 +1110,7 @@
         
         const banner = document.createElement('div');
         banner.className = 'install-banner';
-        banner.innerHTML = `<span>📱 Install App for easy access</span><button id="installAppBtn">Install</button>`;
+        banner.innerHTML = `<span>📱 Install App</span><button id="installAppBtn">Install</button>`;
         document.body.appendChild(banner);
         
         const installBtn = document.getElementById('installAppBtn');
@@ -1275,38 +1118,27 @@
             installBtn.addEventListener('click', () => {
                 if (deferredPrompt) {
                     deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(() => {
-                        banner.style.display = 'none';
-                    });
+                    deferredPrompt.userChoice.then(() => banner.remove());
                 }
             });
         }
         
-        // Auto hide banner after 2 seconds
         setTimeout(() => {
-            if (banner && banner.parentNode) {
-                banner.style.opacity = '0';
-                banner.style.transform = 'translateX(-50%) translateY(-30px)';
-                setTimeout(() => {
-                    if (banner && banner.parentNode) {
-                        banner.remove();
-                    }
-                }, 500);
-            }
+            if (banner && banner.parentNode) banner.remove();
         }, 2000);
     });
     
-    // ==================== INIT ====================
     function init() {
         startGPS();
         startCompass();
-        animate();
         
         qiblaModeBtn.addEventListener('click', () => switchMode('qibla'));
         madinaModeBtn.addEventListener('click', () => switchMode('madina'));
         recalBtn.addEventListener('click', recalibrate);
         debugBtn.addEventListener('click', toggleDebug);
         fullscreenBtn.addEventListener('click', toggleFullscreen);
+        
+        console.log('Compass Live - Ready with Images');
     }
     
     init();
@@ -1316,11 +1148,7 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then(reg => {
-        console.log('Service Worker registered:', reg);
-      }).catch(err => {
-        console.log('SW registration failed:', err);
-      });
+      navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
     });
   }
 </script>
